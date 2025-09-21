@@ -80,10 +80,48 @@ export default {
             height: "0",
           },
         },
+        "border-pulse": {
+          "0%": {
+            boxShadow: "0 0 5px hsl(var(--primary) / 0.3)",
+          },
+          "100%": {
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.6)",
+          },
+        },
+        "pulse-neon": {
+          "0%": {
+            opacity: "0.4",
+            textShadow: "0 0 10px hsl(var(--primary))",
+          },
+          "100%": {
+            opacity: "1",
+            textShadow: "0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary))",
+          },
+        },
+        "float": {
+          "0%, 100%": {
+            transform: "translateY(0)",
+          },
+          "50%": {
+            transform: "translateY(-10px)",
+          },
+        },
+        "spin-slow": {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "border-pulse": "border-pulse 2s ease-in-out infinite alternate",
+        "pulse-neon": "pulse-neon 1.5s ease-in-out infinite alternate",
+        "float": "float 3s ease-in-out infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
       },
     },
   },
