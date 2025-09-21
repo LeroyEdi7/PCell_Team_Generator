@@ -106,12 +106,22 @@ export default {
             transform: "translateY(-10px)",
           },
         },
-        "spin-slow": {
-          from: {
-            transform: "rotate(0deg)",
+        "float-star": {
+          "0%": {
+            transform: "translateX(-100vw) translateY(0px) rotate(0deg)",
           },
-          to: {
-            transform: "rotate(360deg)",
+          "100%": {
+            transform: "translateX(100vw) translateY(-100px) rotate(360deg)",
+          },
+        },
+        "twinkle": {
+          "0%": {
+            opacity: "0.3",
+            transform: "scale(0.8)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "scale(1.2)",
           },
         },
       },
@@ -122,6 +132,8 @@ export default {
         "pulse-neon": "pulse-neon 1.5s ease-in-out infinite alternate",
         "float": "float 3s ease-in-out infinite",
         "spin-slow": "spin-slow 8s linear infinite",
+        "twinkle": "twinkle 2s ease-in-out infinite alternate",
+        "float-star": "float-star 20s linear infinite",
       },
     },
   },

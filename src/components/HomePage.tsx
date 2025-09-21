@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Minus, Users, Target } from 'lucide-react';
+import { Plus, Minus, Users, Target, AlertCircle } from 'lucide-react';
 
 interface HomePageProps {
   onGenerateTeams: (teams: string[][]) => void;
@@ -13,6 +13,7 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
   const [numTeams, setNumTeams] = useState(2);
   const [playersPerTeam, setPlayersPerTeam] = useState(5);
   const [playerNames, setPlayerNames] = useState<string[]>(['']);
+  const [validationError, setValidationError] = useState('');
 
   const addPlayer = () => {
     setPlayerNames([...playerNames, '']);
@@ -21,6 +22,7 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
   const removePlayer = (index: number) => {
     if (playerNames.length > 1) {
       setPlayerNames(playerNames.filter((_, i) => i !== index));
+      setValidationError('');
     }
   };
 
@@ -28,15 +30,32 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
     const updated = [...playerNames];
     updated[index] = name;
     setPlayerNames(updated);
+    setValidationError('');
   };
 
   const generateTeams = () => {
+    // Validate that all player names are filled
+    const emptyNames = playerNames.some((name, index) => name.trim() === '');
+    
+    if (emptyNames) {
+      setValidationError('All player names must be filled in. Please complete all fields or remove empty ones.');
+      return;
+    }
+
     const validPlayers = playerNames.filter(name => name.trim() !== '');
     
     if (validPlayers.length === 0) {
-      alert('Please add at least one player!');
+      setValidationError('Please add at least one player!');
       return;
     }
+
+    if (validPlayers.length < numTeams) {
+      setValidationError(`You need at least ${numTeams} players to create ${numTeams} teams.`);
+      return;
+    }
+
+    // Clear validation error
+    setValidationError('');
 
     // Shuffle players
     const shuffled = [...validPlayers].sort(() => Math.random() - 0.5);
@@ -51,17 +70,37 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
     onGenerateTeams(teams);
   };
 
+  // Create animated stars
+  const createStars = () => {
+    return Array.from({ length: 50 }).map((_, i) => (
+      <div
+        key={i}
+        className="star"
+        style={{
+          width: `${Math.random() * 3 + 1}px`,
+          height: `${Math.random() * 3 + 1}px`,
+          top: `${Math.random() * 100}%`,
+          left: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 20}s`,
+          animationDuration: `${20 + Math.random() * 10}s`,
+        }}
+      />
+    ));
+  };
+
   return (
-    <div className="min-h-screen bg-background p-6 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <div className="min-h-screen bg-background p-6 relative overflow-hidden galaxy-bg">
+      {/* Animated galaxy background with stars */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {createStars()}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-3/4 left-3/4 w-64 h-64 bg-secondary/10 rounded-full blur-2xl animate-float"></div>
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-6xl font-bold bg-gradient-gaming bg-clip-text text-transparent mb-4 animate-pulse-neon">
             TEAM GENERATOR
           </h1>
@@ -70,9 +109,9 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {/* Team Configuration */}
-          <Card className="border-glow bg-card/50 backdrop-blur-sm">
+          <Card className="border-glow bg-card/50 backdrop-blur-sm h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Target className="w-5 h-5" />
@@ -100,7 +139,7 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
                     type="number"
                     value={numTeams}
                     onChange={(e) => setNumTeams(Math.max(2, parseInt(e.target.value) || 2))}
-                    className="text-center bg-input/50 border-primary/30 focus:border-primary"
+                    className="text-center input-interactive bg-input/50 border-primary/30 focus:border-primary"
                     min="2"
                   />
                   <Button
@@ -131,7 +170,7 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
                     type="number"
                     value={playersPerTeam}
                     onChange={(e) => setPlayersPerTeam(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="text-center bg-input/50 border-primary/30 focus:border-primary"
+                    className="text-center input-interactive bg-input/50 border-primary/30 focus:border-primary"
                     min="1"
                   />
                   <Button
@@ -148,7 +187,7 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
           </Card>
 
           {/* Player Names */}
-          <Card className="border-glow bg-card/50 backdrop-blur-sm">
+          <Card className="border-glow bg-card/50 backdrop-blur-sm h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Users className="w-5 h-5" />
@@ -159,14 +198,15 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="space-y-3 max-h-80 overflow-y-auto">
                 {playerNames.map((name, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
                       value={name}
                       onChange={(e) => updatePlayerName(index, e.target.value)}
-                      placeholder={`Player ${index + 1}`}
-                      className="bg-input/50 border-primary/30 focus:border-primary"
+                      placeholder={`Player ${index + 1} *`}
+                      className="input-interactive bg-input/50 border-primary/30 focus:border-primary"
+                      required
                     />
                     <Button
                       variant="outline"
@@ -193,8 +233,18 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
           </Card>
         </div>
 
+        {/* Validation Error */}
+        {validationError && (
+          <div className="max-w-4xl mx-auto mt-6">
+            <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive">
+              <AlertCircle className="w-5 h-5" />
+              <span>{validationError}</span>
+            </div>
+          </div>
+        )}
+
         {/* Generate Button */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-8">
           <Button
             onClick={generateTeams}
             size="lg"
