@@ -3,22 +3,40 @@ import LoadingPage from '@/components/LoadingPage';
 import HomePage from '@/components/HomePage';
 import TeamsPage from '@/components/TeamsPage';
 
+interface PlayerData {
+  numTeams: number;
+  playersPerTeam: number;
+  playerNames: string[];
+}
+
 const Index = () => {
   const [currentView, setCurrentView] = useState<'loading' | 'home' | 'teams'>('loading');
   const [generatedTeams, setGeneratedTeams] = useState<string[][]>([]);
+  const [playerData, setPlayerData] = useState<PlayerData | null>(null);
 
   const handleLoadingComplete = () => {
     setCurrentView('home');
   };
 
-  const handleGenerateTeams = (teams: string[][]) => {
+  const handleGenerateTeams = (teams: string[][], data: PlayerData) => {
     setGeneratedTeams(teams);
+    setPlayerData(data);
     setCurrentView('teams');
   };
 
   const handleRegenerate = () => {
-    // Re-generate teams with the same data
-    setCurrentView('home');
+    if (playerData) {
+      // Regenerate teams with the same player data
+      const validPlayers = playerData.playerNames.filter(name => name.trim() !== '');
+      const shuffled = [...validPlayers].sort(() => Math.random() - 0.5);
+      const teams: string[][] = Array.from({ length: playerData.numTeams }, () => []);
+      
+      shuffled.forEach((player, index) => {
+        teams[index % playerData.numTeams].push(player);
+      });
+      
+      setGeneratedTeams(teams);
+    }
   };
 
   const handleBackToHome = () => {
@@ -40,7 +58,10 @@ const Index = () => {
   }
 
   return (
-    <HomePage onGenerateTeams={handleGenerateTeams} />
+    <HomePage 
+      onGenerateTeams={handleGenerateTeams} 
+      previousData={playerData}
+    />
   );
 };
 

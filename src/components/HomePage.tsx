@@ -5,14 +5,21 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Minus, Users, Target, AlertCircle } from 'lucide-react';
 
-interface HomePageProps {
-  onGenerateTeams: (teams: string[][]) => void;
+interface PlayerData {
+  numTeams: number;
+  playersPerTeam: number;
+  playerNames: string[];
 }
 
-const HomePage = ({ onGenerateTeams }: HomePageProps) => {
-  const [numTeams, setNumTeams] = useState(2);
-  const [playersPerTeam, setPlayersPerTeam] = useState(5);
-  const [playerNames, setPlayerNames] = useState<string[]>(['']);
+interface HomePageProps {
+  onGenerateTeams: (teams: string[][], data: PlayerData) => void;
+  previousData?: PlayerData | null;
+}
+
+const HomePage = ({ onGenerateTeams, previousData }: HomePageProps) => {
+  const [numTeams, setNumTeams] = useState(previousData?.numTeams || 2);
+  const [playersPerTeam, setPlayersPerTeam] = useState(previousData?.playersPerTeam || 5);
+  const [playerNames, setPlayerNames] = useState<string[]>(previousData?.playerNames || ['']);
   const [validationError, setValidationError] = useState('');
 
   const addPlayer = () => {
@@ -67,7 +74,11 @@ const HomePage = ({ onGenerateTeams }: HomePageProps) => {
       teams[index % numTeams].push(player);
     });
 
-    onGenerateTeams(teams);
+    onGenerateTeams(teams, {
+      numTeams,
+      playersPerTeam,
+      playerNames: validPlayers
+    });
   };
 
   // Create animated stars
